@@ -1,0 +1,17 @@
+description     "Beaver Log Shipper"
+
+start on virtual-filesystems
+stop on runlevel [06]
+
+respawn
+respawn limit 5 30
+limit nofile 65550 65550
+
+chdir /home/beaver
+setuid beaver
+setgid adm
+console log
+
+script
+  beaver --configfile /etc/beaver.conf
+end script

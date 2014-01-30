@@ -1,0 +1,37 @@
+server {
+  listen 80;
+  listen [::]:80;
+
+  root /opt/kibana/src;
+  index index.html;
+
+  server_name _;
+
+  access_log off;
+
+  location / {
+    root /etc/nginx/;
+    try_files /maintenance.html $uri $uri/ /index.html;
+  }
+
+  location ~ ^/_aliases$ {
+    proxy_pass $scheme://127.0.0.1:9200;
+    proxy_read_timeout 90;
+  }
+
+  location ~ ^/_nodes$ {
+    proxy_pass $scheme://127.0.0.1:9200;
+    proxy_read_timeout 90;
+  }
+
+  location ~ ^/.*/_search$ {
+    proxy_pass $scheme://127.0.0.1:9200;
+    proxy_read_timeout 90;
+  }
+
+  location ~ ^/.*/_mapping$ {
+    proxy_pass $scheme://127.0.0.1:9200;
+    proxy_read_timeout 90;
+  }
+
+}

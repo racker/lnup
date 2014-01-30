@@ -1,0 +1,19 @@
+description     "logstash indexer instance"
+
+start on virtual-filesystems
+stop on runlevel [06]
+
+respawn
+respawn limit 5 30
+limit nofile 65550 65550
+
+env HOME=/opt/logstash
+
+chdir /opt/logstash
+setuid logstash
+setgid adm
+console log
+
+script
+  exec /usr/bin/java -jar /opt/logstash/logstash-{{ pillar['logstash']['version'] }}-flatjar.jar agent --config /etc/logstash_indexer.conf --filterworkers 3
+end script

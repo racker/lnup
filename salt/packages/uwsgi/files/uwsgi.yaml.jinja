@@ -1,0 +1,21 @@
+uwsgi:
+  ## die-on-term inverts the meanings of SIGTERM and SIGQUIT to uWSGI
+  die-on-term: True
+
+  ## The User ID
+  uid: uwsgi
+
+  ## The Group ID
+  gid: www-data
+
+  ## The emperor will look for applications here
+  emperor: {{ pillar['document_root'] }}/*/*.yaml
+
+  ## Secure multi-user hosting
+  emperor-tyrant: True
+
+  ## Setting POSIX Capabilities to emperor.
+  cap: setgid,setuid
+
+  ## Better locking
+  thunder-lock: True

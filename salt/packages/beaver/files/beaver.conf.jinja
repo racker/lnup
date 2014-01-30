@@ -1,0 +1,17 @@
+{%- set redis_compound_string = "G@node_type:redis and G@datacenter:" +  grains['datacenter'] + " and G@env:" + grains['env'] -%}
+[beaver]
+pid: /run/beaver.pid
+sincedb_path: /home/beaver/since.db
+format: json
+
+transport: redis
+redis_url: redis://{{ salt['publish.publish']( redis_compound_string, 'network.ip_addrs', 'eth0', expr_form='compound').values()[0][0] }}:6379/2
+redis_namespace: logstash
+
+[/var/log/unattended-upgrades/unattended-upgrades.log]
+sincedb_write_interval: 3
+type: unattended-upgrades
+
+{% for line in accumulator['beaverd-logs-accumulated'] -%}
+{{ line }}
+{%- endfor %}

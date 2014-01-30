@@ -1,0 +1,49 @@
+openstack_2GB:
+    ## Redis
+    - stag-iad3-redis-n001.example.com:
+        script_args: git v2014.1.0rc3
+        grains:
+            env: stag
+            newrelic_env: staging
+            datacenter: iad
+            node_type: redis
+
+
+    ## Load Balancer
+    - stag-iad3-lb-n001.example.com:
+        script_args: git v2014.1.0rc3
+        grains:
+            env: stag
+            newrelic_env: staging
+            datacenter: iad
+            node_type: lb
+
+
+    ## Web Heads
+    - stag-iad3-web-n001.example.com:
+        script_args: git v2014.1.0rc3
+        grains:
+            env: stag
+            newrelic_env: staging
+            datacenter: iad
+            node_type: web
+
+
+    ## Postgres
+    - stag-iad3-postgres-n001.example.com:
+        script_args: git v2014.1.0rc3
+        grains:
+            env: stag
+            newrelic_env: staging
+            datacenter: iad
+            node_type: postgres
+
+
+    ## Barman / Logstash / Kibana Node
+    - stag-iad3-util-n001.example.com:
+        script_args: git v2014.1.0rc3
+        grains:
+            env: stag
+            newrelic_env: staging
+            datacenter: iad
+            node_type: util

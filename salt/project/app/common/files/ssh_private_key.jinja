@@ -1,0 +1,5 @@
+{%- if grains['node_type'] == 'postgres' -%}
+  {{ pillar['ssh']['private'][grains['node_type']] }}
+{%- elif grains['node_type'] == 'util' -%}
+  {{ pillar['ssh']['private']['barman'] }}
+{%- endif -%}

@@ -1,0 +1,104 @@
+uwsgi:
+  ## Strict mode; Unknown options will trigger a fatal error.
+  strict: True
+
+  ## The base directory
+  chdir:  %d%n-repo/%n
+
+  ## Master
+  master: True
+
+  ## When enabled, only uWSGI internal messages and errors are logged.
+  disable-logging: True
+
+  ## Offloading redis logging to a dedicated thread
+  threaded-logger: True
+
+  ## What UID to use
+  uid: %n
+
+  ## What GID to use
+  gid: www-data
+
+  ## minimum number of processes
+  cheaper: 1
+
+  ## Maximum number of processes; maybe replaced with "%k".
+  processes: %(%k * 4)
+
+  ## The socket for WSGI (use the full path to be safe)
+  socket: {{ grains['ip_interfaces']['eth0'][0] }}:9999
+
+  ## with appropriate permissions; needs READ / WRITE / EXECUTE to have vacuum work right.
+  #chmod-socket: 760
+
+  ## This socket can be used with uwsgitop or a monitoring agent.
+  stats: %d%n_stats.socket
+
+  ## the virtualenv
+  virtualenv: {{ pillar['document_root'] }}/.virtualenvs/%n
+
+  ## Django's wsgi file
+  module: %n.wsgi:application
+
+  ## The environment setting
+  {% for line in accumulator['uwsgi-envvars-accumulated'] -%}
+  {{ line }}
+  {% endfor %}
+
+  ## clear environment on exit (deletes the socket)
+  #vacuum: True
+
+  ## App's pid
+  pidfile: %d%n.pid
+
+  ## Enable threads
+  enable-threads: True
+
+  ## Run each worker in prethreaded mode with the specified number of threads per worker.
+  threads: 2
+
+  ## Harakiri in verbose mode.
+  harakiri-verbose: True
+
+  ## Cheaper in verbose mode.
+  cheaper-busyness-verbose: True
+
+  ## Kill hung task after X time
+  harakiri: {{ pillar['time_out'] - 1 }}
+
+  ## Run in single interpreter mode
+  single-interpreter: True
+
+  ## Max request before re-cycling a processes
+  max-requests: 150
+
+  ## Set the maximum time (in seconds) a worker can take to reload/shutdown.
+  reload-mercy: 2
+
+  ## Not sure what this does...I think it does the same as reload-mercy.  Cannot find docs on this.
+  worker-reload-mercy: 31
+
+  ## Setting the socket listen high than the default of 100.
+  #listen: 300
+
+  ## Fixed the 'No module named site' error
+  #no-site: True
+
+  ## Load application only in the workers
+  lazy-apps: True
+
+  ## Destroy workers after 60 seconds of inactivity
+  #idle: 61
+
+  ## Better locking
+  thunder-lock: True
+
+  ## Touch to reload application without touching uWSGI
+  touch-chain-reload: %d%n.%e
+
+  ## Transfer offloading for static content; (try to set it to the number of CPU cores to take advantage of SMP).
+  offload-threads: %k
+
+  ## Trust the frontend's Document Root.
+  check-static-docroot: True

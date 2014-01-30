@@ -1,0 +1,46 @@
+{%- set util_compound_string = "G@node_type:util and G@datacenter:" +  grains['datacenter'] + " and G@env:" + grains['env'] -%}
+{%- set postgres_compound_string = "G@node_type:postgres and G@datacenter:" +  grains['datacenter'] + " and G@env:" + grains['env'] -%}
+[barman]
+; Main directory
+barman_home = /var/lib/barman
+
+; System user
+barman_user = barman
+
+; Log location
+log_file = /var/log/barman/barman.log
+
+; Default compression level: possible values are None (default), bzip2, gzip or custom
+compression = bzip2
+
+; Pre/post backup hook scripts
+;pre_backup_script = env | grep ^BARMAN
+;post_backup_script = env | grep ^BARMAN
+
+;; ; 'main' PostgreSQL Server configuration
+[{{ pillar['project_name'] }}]
+;; ; Human readable description
+description = "{{ pillar['project_name'] }} PostgreSQL Database"
+;;
+;; ; SSH options
+
+{% for util in salt['publish.publish']( util_compound_string, 'network.ip_addrs', 'eth0', expr_form='compound').values() %}
+ssh_command = ssh -i /var/lib/barman/.ssh/id_rsa postgres@{{ util.0 }}
+{% endfor %}
+
+;;
+;; ; PostgreSQL connection string
+
+{% for util in salt['publish.publish']( postgres_compound_string, 'network.ip_addrs', 'eth0', expr_form='compound').values() %}
+conninfo = host={{ util.0 }} user=postgres
+{% endfor %}
+
+wal_level = 'archive'
+
+; The "OMG WHY DID I JUST DELETE ALL OF THE BACKUPS" safety.
+minimum_redundancy = 1
+
+; Keep 3 months of backups on hand.
+retention_policy = RECOVERY WINDOW OF 3 MONTHS
+
+retention_policy_mode = auto
